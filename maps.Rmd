@@ -1,0 +1,42 @@
+---
+title: "Maps"
+author: "Rachel A"
+date: "2/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tidycensus)
+census_api_key("353b81c8bf098c3f52cfb954a1501c3824c6f08f")
+```
+
+
+```{r include = FALSE, echo = FALSE}
+racevars <- c(White = "B02001_002", 
+              Black = "B02001_003", 
+              Asian = "B02001_005",
+              Hispanic = "B03003_003")
+miami <- get_acs(geography = "tract",
+                  variables = racevars, 
+                  year = 2018,
+                  state = "FL",
+                  county = "Miami-Dade",
+                  geometry = TRUE,
+                  summary_var = "B02001_001") 
+```
+
+```{r echo = FALSE}
+miami %>%
+  mutate(Percent = 100 * (estimate / summary_est)) %>%
+  ggplot(aes(fill = Percent, color = Percent)) +
+  facet_wrap(~ variable) +
+  geom_sf() +
+  scale_fill_viridis_c(direction = -1) +
+  scale_color_viridis_c(direction = -1) +
+  labs(title = "Racial geography of Miami-Dade County, Florida",
+       caption = "Source: American Community Survey 2014-2018") +
+  theme_void()
+```
+
